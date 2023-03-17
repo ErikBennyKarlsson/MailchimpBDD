@@ -1,0 +1,17 @@
+Feature: Mailchimp - Create valid/invalid account
+
+
+  Scenario Outline: Create account
+    Given I have browser<Browser>
+    Given I have email<Email>
+    Given I have username <Username>
+    Given I have password <Password>
+    When I agree the <therms>
+    Then I signUp <SignUp>
+
+    Examples:
+      | Browser  | Email                 | Username     | Password     | therms | SignUp |
+      | "Chrome" | "myemail@hotmail.com" | "MyUserName" | "Mysecret1!" | "yes"  | "no"   |
+      | "Edge"   | "myemail@hotmail.com" | "hej"        | "Mysecret1!" | "no"   | "no"   |
+      | "Chrome" | ""                    | "MyUserName" | "Mysecret1!" | "yes"  | "yes"  |
+      | "Edge"   | "myemail@hotmail.com" | "MyUsername" | "Mysecret1!" | "yes"  | "no"   |
