@@ -2,28 +2,32 @@ package stepDefinitions;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
 public class MailchimpStepdefs {
-    WebDriver driver;
-    // WebDriver driver2;
+   private WebDriver driver;
+   private WebDriverWait wait;
 
     @Before
     public void setUp() throws InterruptedException {
         System.out.println("nu börjar testet");
+
      /*   System.setProperty("webdriver.chrome.driver", "C:\\Selenium\\chromedriver.exe");
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
@@ -36,21 +40,14 @@ public class MailchimpStepdefs {
         Thread.sleep(1000);
     */
     }
-
     @After
     public void tearDown() {
         driver.close();
         driver.quit();
-        //  driver2.close();
-        //  driver2.quit();
         System.out.println("Nu är detta testfall klart");
     }
 
-    // @Test
-    //  public void openEdge() {
-    //     System.setProperty("webdriver.edge.driver", "C:\\Selenium\\msedgedriver.exe");
-    //    driver = new EdgeDriver();
-    // }
+
     @Given("I have browser{string}")
     public void iHaveBrowserBrowser(String browser) throws InterruptedException {
         if (browser.equals("Chrome")) {
@@ -67,71 +64,106 @@ public class MailchimpStepdefs {
         }
     }
 
-    @Given("I have email{string}")
+    @When("I have email{string}")
     public void iHaveEmail(String email) throws InterruptedException {
 
-        WebElement sendEmail = driver.findElement(By.id("email"));
-        sendEmail.sendKeys(email);
-
+        driver.findElement(By.id("email")).sendKeys(email);
         Thread.sleep(1000);
 
     }
-
-    @Given("I have username {string}")
+    @When("I have username {string}")
     public void iHaveUsernameUsername(String username) throws InterruptedException {
         WebElement sendUsername = driver.findElement(By.id("new_username"));
         sendUsername.click();
         sendUsername.clear();
-        if(username.equals("MyUsername")){
+        Random rand = new Random();
+        if (username.equals("LongUsername")) {
 
-            username=username.repeat(5);
+            username = username.repeat(10);
+            username = username + rand.nextInt(1000000);
             sendUsername.sendKeys(username);
             Thread.sleep(1000);
-            }else if (username.equals("hej")){
+        } else if (username.equals("hej")) {
             sendUsername.sendKeys(username);
             Thread.sleep(1000);
-        }else {
+        } else {
 
-            Random rand = new Random();
-            username = username + rand.nextInt(100000);
+            username = username + rand.nextInt(1000000);
             sendUsername.sendKeys(username);
             Thread.sleep(1000);
         }
+  }
+    /*
+    @Given("I have username MyUserName")
+    public void iHaveUsernameMyUsername() throws InterruptedException {
+        WebElement sendUsername = driver.findElement(By.id("new_username"));
+        sendUsername.click();
+        sendUsername.clear();
+        String username = "MyUserName";
+            Random rand = new Random();
+             username = username + rand.nextInt(1000000);
+            sendUsername.sendKeys(username);
+            Thread.sleep(1000);
+        }
+    @And("I have username hej")
+    public void iHaveUsernameHej() throws InterruptedException {
+        WebElement sendUsername = driver.findElement(By.id("new_username"));
+        String username= "hej";
+        sendUsername.click();
+        sendUsername.clear();
+
+        sendUsername.sendKeys(username);
+        Thread.sleep(1000);
     }
 
+    @And("I have username LongUsername")
+    public void iHaveUsernameLongUsername() throws InterruptedException {
+        WebElement sendUsername = driver.findElement(By.id("new_username"));
+        sendUsername.click();
+        sendUsername.clear();
+        String username ="LongUsername";
+            username = username.repeat(10);
+            sendUsername.sendKeys(username);
+            Thread.sleep(1000);
 
-    @Given("I have password {string}")
+    }
+*/
+    @When("I have password {string}")
     public void iHavePassword(String password) throws InterruptedException {
         WebElement pw = driver.findElement(By.id("new_password"));
         pw.sendKeys(password);
         Thread.sleep(1000);
+        iAgreeTheNewsL((By.name("marketing_newsletter")));
     }
 
-    @When("I agree the {string}")
-    public void iAgreeTheTherms(String therms) throws InterruptedException {
-        if (therms.equals("yes")) {
-            WebElement press = driver.findElement(By.name("marketing_newsletter"));
-            press.click();
+    private void iAgreeTheNewsL(By Newsletters) throws InterruptedException {
+
+           // WebElement press = driver.findElement(By.name("marketing_newsletter"));
+         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(Newsletters));
+            element.click();
             Thread.sleep(2000);
         }
+
+    @Then("I Do signUp")
+    public void IDoSignUp() throws InterruptedException {
+        WebElement pressSignUp = driver.findElement(By.id("create-account-enabled"));
+        pressSignUp.click();
+        Thread.sleep(2000);
+        String expected = "Success | Mailchimp";
+        String actual = driver.getTitle();
+        assertEquals(expected, actual);
     }
-
-    @Then("I signUp {string}")
-    public void iSignUpSignUp(String signUp) throws InterruptedException {
-
-        if (signUp.equals("yes")) {
-            WebElement pressSignUp = driver.findElement(By.id("create-account-enabled"));
-            pressSignUp.click();
-            Thread.sleep(2000);
+    @And("I Dont signUp")
+    public void IDontSignUp() throws InterruptedException {
+        WebElement pressSignUp = driver.findElement(By.id("create-account-enabled"));
+        pressSignUp.click();
+        Thread.sleep(2000);
 
 
-            String expected = "Success | Mailchimp";
-            String actual = driver.getTitle();
+        String expected = "Signup | Mailchimp";
+        String actual = driver.getTitle();
 
-
-            assertEquals(expected, actual);
-        }
+        assertEquals(expected, actual);
     }
-
-
 }
