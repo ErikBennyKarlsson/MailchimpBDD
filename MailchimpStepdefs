@@ -1,0 +1,135 @@
+package stepDefinitions;
+
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+
+public class MailchimpStepdefs {
+   private WebDriver driver;
+   private WebDriverWait wait;
+
+    @Before
+    public void setUp() throws InterruptedException {
+        System.out.println("nu börjar testet");
+
+    }
+    @After
+    public void tearDown() {
+        driver.close();
+        driver.quit();
+        System.out.println("Nu är detta testfall klart");
+    }
+
+    @Given("I have browser{string}")
+    public void iHaveBrowserBrowser(String browser)  {
+        if (browser.equals("Chrome")) {
+            System.setProperty("webdriver.chrome.driver", "C:\\Selenium\\chromedriver.exe");
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--remote-allow-origins=*");
+            driver = new ChromeDriver(options);
+            driver.get("https://login.mailchimp.com/signup/");
+
+        } else {
+            System.setProperty("webdriver.edge.driver", "C:\\Selenium\\msedgedriver.exe");
+            driver = new EdgeDriver();
+            driver.get("https://login.mailchimp.com/signup/");
+        }
+    }
+
+    @When("I have email{string}")
+    public void iHaveEmail(String email) throws InterruptedException {
+
+        driver.findElement(By.id("email")).sendKeys(email);
+        if (email.equals("")){
+
+        }
+
+
+
+    }
+    @When("I have username {string}")
+    public void iHaveUsernameUsername(String username)  {
+        WebElement sendUsername = driver.findElement(By.id("new_username"));
+        sendUsername.click();
+        sendUsername.clear();
+        Random rand = new Random();
+        if (username.equals("LongUsername")) {
+
+            username = username.repeat(10);
+            username = username + rand.nextInt(1000000);
+            sendUsername.sendKeys(username);
+
+        } else if (username.equals("hej")) {
+            sendUsername.sendKeys(username);
+
+        } else {
+
+            username = username + rand.nextInt(1000000);
+            sendUsername.sendKeys(username);
+
+        }
+  }
+
+    @When("I have password {string}")
+    public void iHavePassword(String password) throws InterruptedException {
+        WebElement pw = driver.findElement(By.id("new_password"));
+        pw.sendKeys(password);
+        iAgreeTheNewsL((By.name("marketing_newsletter")));
+    }
+
+    private void iAgreeTheNewsL(By Newsletters)  {
+
+           // WebElement press = driver.findElement(By.name("marketing_newsletter"));
+         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(Newsletters));
+            element.click();
+
+        }
+
+    @Then("I Do signUp")
+    public void IDoSignUp() {
+        WebElement pressSignUp = driver.findElement(By.id("create-account-enabled"));
+        pressSignUp.click();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='lastUnit size1of1']")));
+        String expected = "Success | Mailchimp";
+        String actual = driver.getTitle();
+        assertEquals(expected, actual);
+    }
+    @And("I Dont signUp")
+    public void IDontSignUp() {
+        WebElement pressSignUp = driver.findElement(By.id("create-account-enabled"));
+        pressSignUp.click();
+
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='invalid-error']")));
+
+        String actual = driver.findElement(By.cssSelector("[class='invalid-error']")).getText();
+
+            String expected = "An email address must contain a single @.";
+
+        if (actual.equals("Great minds think alike - someone already has this username. If it's you, log in.")) {
+             expected = "Great minds think alike - someone already has this username. If it's you, log in.";
+        }
+        if (actual.equals("Enter a value less than 100 characters long")) {
+            expected = "Enter a value less than 100 characters long";
+        }
+    assertEquals(expected, actual);
+    }
+}
