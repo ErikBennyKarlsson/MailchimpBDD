@@ -21,14 +21,15 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 
 public class MailchimpStepdefs {
-   private WebDriver driver;
-   private WebDriverWait wait;
+    private WebDriver driver;
+    private WebDriverWait wait;
 
     @Before
-    public void setUp() throws InterruptedException {
+    public void setUp() {
         System.out.println("nu börjar testet");
 
     }
+
     @After
     public void tearDown() {
         driver.close();
@@ -37,7 +38,7 @@ public class MailchimpStepdefs {
     }
 
     @Given("I have browser{string}")
-    public void iHaveBrowserBrowser(String browser)  {
+    public void iHaveBrowserBrowser(String browser) {
         if (browser.equals("Chrome")) {
             System.setProperty("webdriver.chrome.driver", "C:\\Selenium\\chromedriver.exe");
             ChromeOptions options = new ChromeOptions();
@@ -51,22 +52,19 @@ public class MailchimpStepdefs {
             driver.get("https://login.mailchimp.com/signup/");
         }
     }
-
     @When("I have email{string}")
-    public void iHaveEmail(String email) throws InterruptedException {
+    public void iHaveEmail(String email) {
 
         driver.findElement(By.id("email")).sendKeys(email);
-        if (email.equals("")){
-
-        }
-
-
 
     }
+
     @When("I have username {string}")
-    public void iHaveUsernameUsername(String username)  {
+    public void iHaveUsernameUsername(String username) {
+
         WebElement sendUsername = driver.findElement(By.id("new_username"));
-        sendUsername.click();
+        iWantToClick((By.id("new_username")));
+
         sendUsername.clear();
         Random rand = new Random();
         if (username.equals("LongUsername")) {
@@ -82,54 +80,49 @@ public class MailchimpStepdefs {
 
             username = username + rand.nextInt(1000000);
             sendUsername.sendKeys(username);
-
         }
-  }
-
-    @When("I have password {string}")
-    public void iHavePassword(String password) throws InterruptedException {
-        WebElement pw = driver.findElement(By.id("new_password"));
-        pw.sendKeys(password);
-        iAgreeTheNewsL((By.name("marketing_newsletter")));
     }
 
-    private void iAgreeTheNewsL(By Newsletters)  {
+    @When("I have password {string}")
+    public void iHavePassword(String password) {
+        WebElement pw = driver.findElement(By.id("new_password"));
+        pw.sendKeys(password);
+        iWantToClick((By.name("marketing_newsletter")));
+    }
 
-           // WebElement press = driver.findElement(By.name("marketing_newsletter"));
-         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(Newsletters));
-            element.click();
-
-        }
+    private void iWantToClick(By click) {
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(click));
+        element.click();
+    }
 
     @Then("I Do signUp")
     public void IDoSignUp() {
-        WebElement pressSignUp = driver.findElement(By.id("create-account-enabled"));
-        pressSignUp.click();
+        iWantToClick((By.id("create-account-enabled")));
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='lastUnit size1of1']")));
         String expected = "Success | Mailchimp";
         String actual = driver.getTitle();
         assertEquals(expected, actual);
     }
+
     @And("I Dont signUp")
     public void IDontSignUp() {
-        WebElement pressSignUp = driver.findElement(By.id("create-account-enabled"));
-        pressSignUp.click();
+        iWantToClick((By.id("create-account-enabled")));
 
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='invalid-error']")));
 
         String actual = driver.findElement(By.cssSelector("[class='invalid-error']")).getText();
 
-            String expected = "An email address must contain a single @.";
+        String expected = "An email address must contain a single @.";
 
         if (actual.equals("Great minds think alike - someone already has this username. If it's you, log in.")) {
-             expected = "Great minds think alike - someone already has this username. If it's you, log in.";
+            expected = "Great minds think alike - someone already has this username. If it's you, log in.";
         }
         if (actual.equals("Enter a value less than 100 characters long")) {
             expected = "Enter a value less than 100 characters long";
         }
-    assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 }
