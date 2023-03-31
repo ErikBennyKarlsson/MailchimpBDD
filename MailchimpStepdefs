@@ -14,27 +14,18 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
 
 public class MailchimpStepdefs {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    @Before
-    public void setUp() {
-        System.out.println("nu börjar testet");
-
-    }
-
     @After
     public void tearDown() {
         driver.close();
         driver.quit();
-        System.out.println("Nu är detta testfall klart");
     }
 
     @Given("I have browser{string}")
@@ -52,11 +43,11 @@ public class MailchimpStepdefs {
             driver.get("https://login.mailchimp.com/signup/");
         }
     }
+
     @When("I have email{string}")
     public void iHaveEmail(String email) {
 
         driver.findElement(By.id("email")).sendKeys(email);
-
     }
 
     @When("I have username {string}")
@@ -73,7 +64,7 @@ public class MailchimpStepdefs {
             username = username + rand.nextInt(1000000);
             sendUsername.sendKeys(username);
 
-        } else if (username.equals("hej")) {
+        } else if (username.equals("occupied")) {
             sendUsername.sendKeys(username);
 
         } else {
@@ -99,6 +90,7 @@ public class MailchimpStepdefs {
     @Then("I Do signUp")
     public void IDoSignUp() {
         iWantToClick((By.id("create-account-enabled")));
+        iWantToClick((By.id("create-account-enabled")));
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='lastUnit size1of1']")));
         String expected = "Success | Mailchimp";
@@ -106,8 +98,10 @@ public class MailchimpStepdefs {
         assertEquals(expected, actual);
     }
 
-    @And("I Dont signUp")
+
+    @Then("I Dont signUp")
     public void IDontSignUp() {
+        iWantToClick((By.id("create-account-enabled")));
         iWantToClick((By.id("create-account-enabled")));
 
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -126,3 +120,4 @@ public class MailchimpStepdefs {
         assertEquals(expected, actual);
     }
 }
+
