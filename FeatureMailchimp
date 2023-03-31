@@ -1,6 +1,5 @@
 Feature: Mailchimp - Create valid/invalid account
 
-
   Scenario Outline: Create account
     Given I have browser<Browser>
     When I have email<Email>
@@ -15,7 +14,7 @@ Feature: Mailchimp - Create valid/invalid account
       | "Chrome" | ""                    | "ValidUsername" | "Mysecret1!" | Dont     |
       | "Edge"   | "myemail@hotmail.com" | "LongUsername"  | "Mysecret1!" | Dont     |
 
-  # test 1: Valid sign in. - Chrome
-  # test 2: Username already in use. - Edge
-  # test 3: Valid username without email. - Chrome
-  # test 4: Username with 100+ letters - Edge
+   # test 1: Valid sign in. - Chrome - expected to succeed
+  # test 2: Username already in use. - Edge - expected to fail
+  # test 3: Valid username without email. - Chrome - expected to fail
+  # test 4: Username with 100+ letters - Edge - expected to fail
